@@ -1,0 +1,53 @@
+{% extends "header.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Main page{% endblock %}</title>
+{%block stylesScripts %}
+    <link href="/static/styles/agent_summaries.css" type="text/css" rel="stylesheet">
+    <script src="/static/js/agent_summaries.js" type="text/javascript"></script>
+{% endblock %}
+</head>
+{% block body %}
+<div class="d-flex justify-content-sm-between m-3">
+    <div id="agent_summaries">
+        <h1>Logging part</h1>
+
+        <table style="padding: 5px 0; border-spacing: 5px 5px;border-collapse: separate;">
+            <thead>
+                <tr class=".bu" style="outline: black solid 1px;border-radius: 3px;">
+                    <td style="width: 70px">Car id</td>
+                    <td style="width: 300px">Position</td>
+                    <td style="width: 300px">Velocity</td>
+                    <td style="width: 60px">Boost</td>
+                </tr>
+            </thead>
+        </table>
+
+        <!--<h2 style="font-weight: lighter">Orange team</h2>-->
+
+        <table style="margin-top: 25px;background: #ff8822; margin-bottom: 25px; border-radius: 10px; padding: 5px 0; border-spacing: 5px 5px;border-collapse: separate;">
+            <tbody id="orange_log" style="margin-top: 10px; background: #ff8822">
+            </tbody>
+        </table>
+
+        <!--<h2 style="font-weight: lighter">Blue team</h2>-->
+
+        <table style="margin-top: 25px; background: #2222ff; border-radius: 10px; padding: 5px 0; border-spacing: 5px 5px;border-collapse: separate;">
+            <tbody id="blue_log" style="background: #2222ff">
+                <p id="waiting-data" class="text-center">Waiting for data...</p>
+            </tbody>
+        </table>
+    </div>
+    <canvas width="523" height="733">
+        <img class="img-fluid" id="bg_field" src="/static/bg_field.png"  alt="Image">
+        <img id="bg" src="/static/bg_field.png" width={0} height={0} style="visibility: collapse"/>
+        <img id="blue_car" src="/static/blue_octane_redim.png" width={0} height={0} style="visibility: collapse"/>
+        <img id="orange_car" src="/static/orange_octane_redim.png" width={0} height={0} style="visibility: collapse"/>
+        <img id="car" src="/static/octane.png" width={0} height={0} style="visibility: collapse"/>
+    </canvas>
+    </div>
+{% endblock %}
+
+</html>

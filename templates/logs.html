@@ -1,0 +1,29 @@
+{% extends "header.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Logs{% endblock %}</title>
+</head>
+
+{% block body %}
+    <div class="m-3 p-3">
+        <h1>Logs</h1>
+        <p>Here are the logs of the learner and worker</p>
+    </div>
+
+    <div class="d-flex justify-content-around" id="logs">
+         <div id="learner_log">
+            <p class="text-center">Learner log</p>
+            <p class="border rounded p-3" id="log">Nothing</p>
+        </div>
+
+        <div id="learner_log">
+            <p class="text-center">Worker log</p>
+            <p class="border rounded p-3" id="log">Nothing</p>
+        </div>
+    </div>
+
+
+{% endblock %}
+</html>

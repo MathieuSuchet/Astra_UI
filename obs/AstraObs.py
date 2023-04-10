@@ -84,7 +84,7 @@ class AstraObs(AdvancedObs):
         else:
             timers = self.boosts_timers
 
-        base_obs = np.concatenate((base_obs, timers))
+        # base_obs = np.concatenate((base_obs, timers))
         # print(f" ========= Player team : {player.team_num} | Car id {player.car_id} ========= ")
         # AstraObs.print_obs(base_obs)
         return base_obs

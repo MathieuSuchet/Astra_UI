@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Astra | {% block title %}{% endblock %}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+{%block stylesScripts %}{% endblock %}
+</head>
+<body>
+<header class="border d-flex m-2 p-2 rounded justify-content-between flex-row bg-primary text-white">
+    <div class="d-inline-block">
+        <img src="static/rl_logo.png" width="90" height="50" alt="rl_logo"/>
+        <p class="mt-1 text-center">Astra UI</p>
+    </div>
+
+    <div class="border rounded p-3 bg-dark text-center align-middle">
+    <p></p>
+        {% if bot.running %}
+            <p class="text-success">Astra is running</p>
+        {% else %}
+            <p class="text-warning">Astra is connected</p>
+        {% endif %}
+    </div>
+</header>
+<nav class="navbar navbar-dark">
+    <a href="{{ url_for("index") }}">
+        <button class="btn border rounded .bg-primary">
+        Home
+    </button>
+    </a>
+    <a href="{{ url_for("agents_summaries") }}">
+        <button class="btn border rounded .bg-primary">
+        Agents summaries
+    </button>
+    </a>
+
+    <a href="{{ url_for("rewards") }}">
+        <button class="btn border rounded .bg-primary">
+        Rewards
+    </button>
+    </a>
+    <a href="{{ url_for("logs") }}">
+        <button class="btn border rounded .bg-primary">
+        Logs
+    </button>
+    </a>
+    <a href="{{ url_for("about") }}">
+        <button class="btn border rounded .bg-primary">
+        About
+    </button>
+    </a>
+
+</nav>
+{% block body %}
+    <p>Insert body here</p>
+{% endblock %}
+<!--{% block footer %}
+    <footer class="footer bg-dark p-3 d-flex text-white justify-content-sm-between" style="position: absolute; bottom: 0; width: 100%">
+    <div>
+        <img src="static/rl_logo.png" width="90" height="50" alt="rl_logo"/>
+        <h2>Astra UI</h2>
+        <p>We ain't harvesting data</p>
+    </div>
+    <div>
+        <h4>Categories</h4>
+        <ul class="list-group" style="list-style: none">
+            <li><a href="{{ url_for("agents_summaries") }}">Agents summaries</a></li>
+            <li><a href="{{ url_for("rewards") }}">Rewards</a></li>
+            <li><a href="{{ url_for("about") }}">About</a></li>
+        </ul>
+    </div>
+
+</footer>
+{% endblock %}-->
+</body>
+
+</html>

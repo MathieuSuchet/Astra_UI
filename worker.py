@@ -2,18 +2,19 @@ import os
 from typing import Any
 
 import numpy
+import torch
+from colorama import Fore
 from redis import Redis
-from rlgym.utils.action_parsers.discrete_act import DiscreteAction
+from rlgym.utils.action_parsers import DiscreteAction
 from rlgym.utils.gamestates import PlayerData
-from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward, EventReward, TouchBallReward, \
-    FaceBallReward
 from rlgym.utils.terminal_conditions.common_conditions import GoalScoredCondition, TimeoutCondition
 from rlgym_tools.sb3_utils.sb3_log_reward import SB3CombinedLogReward
 from rocket_learn.rollout_generator.redis.redis_rollout_worker import RedisRolloutWorker
-from ui.main import AstraMatch, Software
 
 from CustomStateSetter import *
 from obs.AstraObs import AstraObs
+
+torch.set_num_threads(1)
 
 
 class ExpandAdvancedObs(AstraObs):
@@ -22,63 +23,58 @@ class ExpandAdvancedObs(AstraObs):
         return numpy.expand_dims(obs, 0)
 
 
+def print_worker(data):
+    print(Fore.CYAN + "Worker : ", end="")
+    print(data)
+
+
+class Worker:
+    def __init__(self, team_size, obs_builder, action_parser, state_setter, rewards, rewards_weights,
+                 terminal_conditions):
+        self.team_size = team_size
+        self.obs_builder = obs_builder
+        self.action_parser = action_parser
+        self.state_setter = state_setter
+        self.rewards = rewards
+        self.rewards_weights = rewards_weights
+        self.terminal_conditions = terminal_conditions
+
+    def match(self) -> Match:
+        return Match(
+            game_speed=100,
+            spawn_opponents=True,
+            team_size=3,
+            state_setter=self.state_setter,
+            obs_builder=self.obs_builder,
+            action_parser=self.action_parser,
+            terminal_conditions=self.terminal_conditions,
+            reward_function=SB3CombinedLogReward(
+                reward_functions=self.rewards,
+                reward_weights=self.rewards_weights)
+        )
+
+    def run(self, redis, name):
+        RedisRolloutWorker(redis, name, self.match(),
+                           past_version_prob=.2,
+                           evaluation_prob=0.01,
+                           sigma_target=2,
+                           dynamic_gm=True,
+                           send_obs=True,
+                           auto_minimize=False,
+                           streamer_mode=False,
+                           send_gamestates=False,
+                           force_paging=False,
+                           local_cache_name="Normal_astra_model_db").run()
+
+
 if __name__ == "__main__":
-    """
-
-    Starts up a rocket-learn worker process, which plays out a game, sends back game data to the 
-    learner, and receives updated model parameters when available
-
-    """
-
-    # OPTIONAL ADDITION:
-    # LIMIT TORCH THREADS TO 1 ON THE WORKERS TO LIMIT TOTAL RESOURCE USAGE
-    # TRY WITH AND WITHOUT FOR YOUR SPECIFIC HARDWARE
-    import torch
-
-    torch.set_num_threads(1)
-
-    s = Software()
-
-    # BUILD THE ROCKET LEAGUE MATCH THAT WILL USED FOR TRAINING
-    # -ENSURE OBSERVATION, REWARD, AND ACTION CHOICES ARE THE SAME IN THE WORKER
-    match = AstraMatch(
-        game_speed=100,
-        spawn_opponents=True,
+    Worker(
         team_size=3,
-        state_setter=ProbabilisticStateSetter(),
         obs_builder=ExpandAdvancedObs(),
         action_parser=DiscreteAction(),
-        terminal_conditions=[TimeoutCondition(round(2000)),
-                             GoalScoredCondition()],
-        reward_function=SB3CombinedLogReward(
-            reward_functions=(
-                VelocityBallToGoalReward(),
-                EventReward(
-                    goal=100,
-                    concede=-100,
-                    save=50,
-                ),
-                FaceBallReward(),
-                TouchBallReward(),
-            ),
-            reward_weights=(1.0, 2.0, 1.0, 1.0)),
-        software=s
-    )
-
-    # LINK TO THE REDIS SERVER YOU SHOULD HAVE RUNNING (USE THE SAME PASSWORD YOU SET IN THE REDIS
-    # CONFIG)
-    r = Redis(host="127.0.0.1", username="test-bot", password=os.environ["REDIS_PASSWORD"], port=6379, db=3)
-
-    # LAUNCH ROCKET LEAGUE AND BEGIN TRAINING
-    # -past_version_prob SPECIFIES HOW OFTEN OLD VERSIONS WILL BE RANDOMLY SELECTED AND TRAINED AGAINST
-    RedisRolloutWorker(r, "astra_512_neurons_3_hidden_tuned_state_setter", match,
-                       past_version_prob=.2,
-                       evaluation_prob=0.01,
-                       sigma_target=2,
-                       dynamic_gm=True,
-                       send_obs=True,
-                       auto_minimize=False,
-                       streamer_mode=False,
-                       send_gamestates=False,
-                       force_paging=False,
-                       local_cache_name="astra_512_neurons_3_hidden_tuned_state_setter_model_db").run()
+        state_setter=ProbabilisticStateSetter(),
+        rewards=(),
+        rewards_weights=(),
+        terminal_conditions=[GoalScoredCondition(), TimeoutCondition(2000)]
+    ).run(Redis(host="127.0.0.1", username="test-bot", password=os.environ["REDIS_PASSWORD"], port=6379,
+                db=5), "Normal-astra")

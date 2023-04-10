@@ -1,0 +1,50 @@
+{% extends "header.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Home{% endblock %}</title>
+{% block stylesScripts %}
+    <script src="static/js/index.js" type="text/javascript"></script>
+{% endblock %}
+</head>
+{% block body %}
+    <div class="mx-5 my-2 p-3">
+        <h2>Welcome to AstraUI</h2>
+        <p>This place is made to monitor a bot named astra</p>
+
+        <p>You can take a look in the upper right corner of the page to see the current state of the bot, there are 2 possible states</p>
+        <ul>
+            <li><strong>Connected</strong> : The bot and the ui are connected, the bot hasn't started</li>
+            <li><strong>Running</strong> : The bot and the ui are connected, the bot started</li>
+        </ul>
+        <p>As a quick note, the bot is considered running if the worker and learner are both running</p>
+
+        <p>The following buttons let you start/stop astra and/or its components</p>
+
+        <div id="astra_both" class="d-inline">
+        {% if bot.running %}
+            <button id="stop_btn" class="btn border rounded btn-secondary p-3" onclick="send_stop_signal()">Stop Astra</button>
+        {% else %}
+            <button id="start_btn" class="btn border rounded btn-dark p-3" onclick="send_start_signal()">Start Astra</button>
+        {% endif %}
+        </div>
+
+        <div id="astra_learner" class="d-inline">
+            {% if bot.learner_running %}
+            <button id="stop_learner_btn" class="btn border rounded btn-secondary p-3" onclick="send_stop_signal_learner()">Stop Astra (learner only)</button>
+            {% else %}
+            <button id="start_learner_btn" class="btn border rounded btn-dark p-3" onclick="send_start_signal_learner()">Start Astra (learner only)</button>
+            {% endif %}
+        </div>
+
+        <div id="astra_worker" class="d-inline">
+        {% if bot.worker_running %}
+            <button id="stop_worker_btn" class="btn border rounded btn-secondary p-3" onclick="send_stop_signal_worker()">Stop Astra (worker only)</button>
+        {% else %}
+            <button id="start_worker_btn" class="btn border rounded btn-dark p-3" onclick="send_start_signal_worker()">Start Astra (worker only)</button>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}
+</html>
